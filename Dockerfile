@@ -36,7 +36,7 @@ COPY ./app /app/app
 # you don't strictly need to copy .env. But if your services relies on `load_dotenv()`
 # finding it, it must be present.
 # For demo/local, copying it is okay, but be aware of the security implication.
-COPY .env .
+RUN source .env
 
 # Expose the port that FastAPI will run on.
 # This informs Docker that the container listens on the specified network port.
