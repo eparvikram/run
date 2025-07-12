@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - master  # Change if using another branch
+      - master  # or main, depending on your default
 
 jobs:
   build-and-push:
@@ -28,4 +28,3 @@ jobs:
         context: .
         push: true
         tags: paritoshvikram/code_gen_hld:latest
-
