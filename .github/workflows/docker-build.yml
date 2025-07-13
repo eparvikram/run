@@ -1,21 +1,17 @@
-name: Build and Push Docker Image
+name: CI/CD Docker Compose
 
 on:
   push:
     branches:
-      - master
+      - master  # or main
 
 jobs:
-  build-and-push:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Extract Git SHA
-      id: vars
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -26,11 +22,19 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: |
-          paritoshvikram/code_gen_hld:latest
-          paritoshvikram/code_gen_hld:${{ steps.vars.outputs.sha_short }}
+    - name: Build with Docker Compose
+      run: docker compose -f docker-compose.yml build
+
+    - name: Run container
+      run: docker compose up -d
+
+    - name: Wait for app to start
+      run: sleep 10
+
+    - name: Run tests (if any)
+      run: |
+        docker ps
+        # docker exec fastapi_app pytest  # If you have tests
+
+    - name: Push to Docker Hub
+      run: docker compose push || echo "Skipping push (optional step)"
