@@ -29,10 +29,3 @@ jobs:
           file: ./code-gen/Dockerfile
           push: true
           tags: paritoshvikram/code_gen_hld:latest
-
-      - name: Build and Push Infra Service
-        uses: docker/build-push-action@v5
-        with:
-          context: ./infra
-          file: ./infra/docker-compose.yml  # ❌ this is NOT a Dockerfile; likely wrong
-          push: false  # ⛔ docker-compose.yml can't be built like this, so set false
