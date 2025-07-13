@@ -3,7 +3,7 @@ name: CI/CD Docker Compose
 on:
   push:
     branches:
-      - master
+      - uplift
 
 jobs:
   build-and-deploy:
