@@ -1,4 +1,4 @@
-name: CI/CD Docker Compose
+name: CI/CD with Docker Compose
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
@@ -22,10 +22,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push CodeGen Service
-        uses: docker/build-push-action@v5
-        with:
-          context: ./code-gen
-          file: ./code-gen/Dockerfile
-          push: true
-          tags: paritoshvikram/code_gen_hld:latest
+      - name: Build Images using Docker Compose
+        run: |
+          docker compose -f infra/docker-compose.yml build
+
+      - name: Tag and Push Image to Docker Hub
+        run: |
+          docker tag fastapi_app paritoshvikram/code_gen_hld:latest
+          docker push paritoshvikram/code_gen_hld:latest
