@@ -1,4 +1,4 @@
-name: CI/CD with Docker Compose
+name: CI/CD Docker Compose
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
@@ -22,11 +22,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Images using Docker Compose
+      - name: Build and push using Docker Compose
         run: |
-          docker compose -f infra/docker-compose.yml build
-
-      - name: Tag and Push Image to Docker Hub
-        run: |
+          cd infra
+          docker compose build
           docker tag fastapi_app paritoshvikram/code_gen_hld:latest
           docker push paritoshvikram/code_gen_hld:latest
