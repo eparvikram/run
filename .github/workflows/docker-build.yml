@@ -22,18 +22,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push CodeGen Service
+      - name: Build and Push FastAPI App
         uses: docker/build-push-action@v5
         with:
-          context: ./code-gen
-          file: ./code-gen/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
-          tags: paritoshvikram/code_gen_hld:latest
-
-      - name: Build and Push Infra Service
-        uses: docker/build-push-action@v5
-        with:
-          context: ./infra
-          file: ./infra/Dockerfile
-          push: true
-          tags: paritoshvikram/infra:latest
+          tags: paritoshvikram/fastapi-app:latest
