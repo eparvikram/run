@@ -5,12 +5,13 @@ name: Build & Push SDLC Middleware App Image
 on:
   push:
     branches:
-      - uplift
-  pull_request:
+      - uplift # Triggers on push to the 'uplift' branch
+      # - main   # Uncomment if you also want to build on pushes to 'main'
+  pull_request: # (Optional) Build image for PRs to uplift for early validation
     branches:
       - uplift
-  release:
-    types: [published, created]
+  release: # <--- ADDED EVENT
+    types: [published, created] # Triggers when a release is published or created
 
 jobs:
   build-and-push:
@@ -45,7 +46,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}
+          # CORRECTED: Changed 'sdlc-middleware' to 'code_gen_hld'
+          tags: paritoshvikram/code_gen_hld:${{ env.DOCKER_IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -57,7 +59,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
-          repository: paritoshvikram/sdlc-deploy
+          repository: paritoshvikram/sdlc-deploy # <--- Replace with your actual deployment repo name
           event-type: deploy-sdlc-middleware-dev
           client-payload: >-
             {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
