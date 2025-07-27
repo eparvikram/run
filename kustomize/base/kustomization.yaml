@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+# You can add common labels, annotations, or patches here if they apply to all environments
+commonLabels:
+  app.kubernetes.io/name: fastapi-app
+  app.kubernetes.io/instance: common-instance
+
+# Example: setting a common image tag if you don't want to use specific tags in base
+# images:
+#   - name: your-docker-username/your-fastapi-app # Matches the image name in deployment.yaml
+#     newTag: latest # Or a specific common tag

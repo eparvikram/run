@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-fastapi-app
+  labels:
+    app: my-fastapi-app
+spec:
+  replicas: 1 # This can be overridden in overlays
+  selector:
+    matchLabels:
+      app: my-fastapi-app
+  template:
+    metadata:
+      labels:
+        app: my-fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: paritoshvikram/fastapi-app:latest # Use a generic tag or a placeholder
+        imagePullPolicy: IfNotPresent # Or Always if pulling from a registry
+        ports:
+        - containerPort: 8000

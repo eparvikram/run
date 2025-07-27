@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base # Point to the base directory
+
+# Overrides for the dev environment
+# You can change image tags, replica counts, add environment variables, etc.
+images:
+  - name: your-docker-username/your-fastapi-app # Must match the image name in base/deployment.yaml
+    newTag: dev # This will be replaced by the SHA tag from CI/CD, but useful for local builds
+
+replicas:
+  - name: my-fastapi-app # Name of the deployment
+    count: 1 # Example: always 1 replica for dev
+
+patches:
+  - path: dev-patch.yaml # Optional: apply a specific patch for dev
+    target:
+      kind: Deployment
+      name: my-fastapi-app
+
+# Add a common suffix to all resource names for better identification
+nameSuffix: -dev
+
+# Add common labels specific to dev
+commonLabels:
+  env: dev
