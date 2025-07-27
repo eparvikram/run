@@ -5,10 +5,13 @@ name: Build & Push SDLC Middleware App Image
 on:
   push:
     branches:
+      - uplift # Triggers on push to the 'uplift' branch
+      # - main   # Uncomment if you also want to build on pushes to 'main'
+  pull_request: # (Optional) Build image for PRs to uplift for early validation
+    branches:
       - uplift
-
   release: # <--- ADDED EVENT
-    types: [published, created]
+    types: [published, created] # Triggers when a release is published or created
 
 jobs:
   build-and-push:
@@ -27,9 +30,8 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Determine Docker Image Tag
-      id: set_image_tag # Give this step an ID if you want to reference its outputs later
+      id: set_image_tag
       run: |
-        # Use shell conditional logic to determine the tag
         if [[ "${{ github.event_name }}" == "release" ]]; then
           IMAGE_TAG="${{ github.event.release.tag_name }}"
           echo "Using release tag: $IMAGE_TAG"
@@ -54,11 +56,14 @@ jobs:
       run: echo "Docker image built and pushed: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}"
 
     # --- Automation to trigger deployment repo (Optional but highly recommended) ---
-    # - name: Trigger Deployment Workflow in sdlc-deploy repo
-    #   uses: peter-evans/repository-dispatch@v3
-    #   if: github.event_name == 'release' # Only dispatch when a release is published/created
-    #   with:
-    #     token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
-    #     repository: paritoshvikram/sdlc-deploy
-    #     event-type: deploy-sdlc-middleware-dev
-    #     client-payload: '{"service_folder": "sdlc-middleware", "image_tag": "${{ env.DOCKER_IMAGE_TAG }}"}'
+    # IMPORTANT: Ensure 'PAT_FOR_SDLC_DEPLOY_REPO' secret exists in this 'run' repository.
+    # It needs 'repo' scope permissions.
+    - name: Trigger Deployment Workflow in sdlc-deploy repo
+      uses: peter-evans/repository-dispatch@v3
+      # Only dispatch when a release is published/created, as this is typically the "stable" artifact
+      if: github.event_name == 'release'
+      with:
+        token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
+        repository: paritoshvikram/sdlc-deploy # <--- IMPORTANT: Replace with your actual deployment repo name (e.g., 'your-org/sdlc-deploy')
+        event-type: deploy-sdlc-middleware-dev # Matches the 'types' in sdlc-deploy's workflow_dispatch
+        client-payload: '{"service_folder": "sdlc-middleware", "image_tag": "${{ env.DOCKER_IMAGE_TAG }}"}'
