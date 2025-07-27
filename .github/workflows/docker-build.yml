@@ -52,7 +52,8 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Print pushed image tag
-        run: echo "Docker image built and pushed: paritoshvikram/code_gen_hld:latest"
+        # CORRECTED: Changed 'latest' to use the dynamic DOCKER_IMAGE_TAG
+        run: echo "Docker image built and pushed: paritoshvikram/code_gen_hld:${{ env.DOCKER_IMAGE_TAG }}"
 
       - name: Trigger Deployment Workflow in sdlc-deploy repo
         if: github.event_name == 'release'
