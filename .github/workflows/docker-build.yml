@@ -51,16 +51,12 @@ jobs:
 
       - name: Print pushed image tag
         run: echo "Docker image built and pushed: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}"
-
       - name: Trigger Deployment Workflow in sdlc-deploy repo
         if: github.event_name == 'release'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
           repository: paritoshvikram/sdlc-deploy
-          event-type: deploy-sdlc-middleware-dev
-          client-payload: >-
-            {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
           event-type: deploy-sdlc-middleware-dev
           client-payload: >-
             {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
