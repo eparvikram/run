@@ -58,5 +58,5 @@ jobs:
           token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
           repository: paritoshvikram/sdlc-deploy
           event-type: deploy-sdlc-middleware-dev
-          client-payload: >-
+          client-payload: "{\"service_folder\":\"sdlc-middleware\",\"image_tag\":\"${{ env.DOCKER_IMAGE_TAG }}\"}"
             {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
