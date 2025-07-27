@@ -7,40 +7,58 @@ on:
     branches:
       - uplift
 
-  release: # <--- ADD THIS EVENT
-    types: [published, created] # Triggers when a release is published or created
-    # Other types include: edited, deleted, prereleased, released, unpublished
+  release: # <--- ADDED EVENT
+    types: [published, created]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    # ... (your existing steps for checkout, Docker login, build/push) ...
+    - name: Checkout app code
+      uses: actions/checkout@v4
 
-    - name: Use Release Tag as Docker Image Tag (Conditional)
-      if: github.event_name == 'release'
-      run: |
-        # For a release, the tag is readily available
-        echo "DOCKER_IMAGE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-        echo "Using release tag: ${{ github.event.release.tag_name }}"
-      # If not a release event, use SHA as fallback for push/PR
-      # This makes the build step more generic
-      if: github.event_name != 'release'
-      run: |
-        echo "DOCKER_IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
-        echo "Using commit SHA: ${{ github.sha }}"
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Determine Docker Image Tag
+      id: set_image_tag # Give this step an ID if you want to reference its outputs later
+      run: |
+        # Use shell conditional logic to determine the tag
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          IMAGE_TAG="${{ github.event.release.tag_name }}"
+          echo "Using release tag: $IMAGE_TAG"
+        else
+          IMAGE_TAG="${{ github.sha }}"
+          echo "Using commit SHA: $IMAGE_TAG"
+        fi
+        # Export the variable so it's available to subsequent steps in this job
+        echo "DOCKER_IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV # This makes it available as ${{ env.DOCKER_IMAGE_TAG }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        # Now use the DOCKER_IMAGE_TAG environment variable set above
+        # Use the environment variable set in the previous step
         tags: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    # ... (rest of your steps, like repository_dispatch) ...
-    # When using repository_dispatch, pass the correct tag:
-    # client-payload: '{"image_tag": "${{ env.DOCKER_IMAGE_TAG }}"}'
+    - name: Print pushed image tag
+      run: echo "Docker image built and pushed: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}"
+
+    # --- Automation to trigger deployment repo (Optional but highly recommended) ---
+    # - name: Trigger Deployment Workflow in sdlc-deploy repo
+    #   uses: peter-evans/repository-dispatch@v3
+    #   if: github.event_name == 'release' # Only dispatch when a release is published/created
+    #   with:
+    #     token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
+    #     repository: paritoshvikram/sdlc-deploy
+    #     event-type: deploy-sdlc-middleware-dev
+    #     client-payload: '{"service_folder": "sdlc-middleware", "image_tag": "${{ env.DOCKER_IMAGE_TAG }}"}'
