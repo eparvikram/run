@@ -58,10 +58,10 @@ jobs:
     # --- Automation to trigger deployment repo (Optional but highly recommended) ---
     # IMPORTANT: Ensure 'PAT_FOR_SDLC_DEPLOY_REPO' secret exists in this 'run' repository.
     # It needs 'repo' scope permissions.
-    - name: Trigger Deployment Workflow in sdlc-deploy repo
+
+    - name: Trigger Deployment Workflow in sdlc-deploy repo # This should be the exact line 54 in your file
       uses: peter-evans/repository-dispatch@v3
-      # Only dispatch when a release is published/created, as this is typically the "stable" artifact
-      if: github.event_name == 'release'
+      if: github.event_name == 'release' # <--- THIS IS YOUR LINE 56, ensure correct indentation
       with:
         token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
         repository: paritoshvikram/sdlc-deploy # <--- IMPORTANT: Replace with your actual deployment repo name (e.g., 'your-org/sdlc-deploy')
