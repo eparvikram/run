@@ -61,3 +61,6 @@ jobs:
           event-type: deploy-sdlc-middleware-dev
           client-payload: >-
             {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
+          event-type: deploy-sdlc-middleware-dev
+          client-payload: >-
+            {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
