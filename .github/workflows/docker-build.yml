@@ -5,13 +5,12 @@ name: Build & Push SDLC Middleware App Image
 on:
   push:
     branches:
-      - uplift # Triggers on push to the 'uplift' branch
-      # - main   # Uncomment if you also want to build on pushes to 'main'
-  pull_request: # (Optional) Build image for PRs to uplift for early validation
+      - uplift
+  pull_request:
     branches:
       - uplift
-  release: # <--- ADDED EVENT
-    types: [published, created] # Triggers when a release is published or created
+  release:
+    types: [published, created]
 
 jobs:
   build-and-push:
@@ -46,24 +45,19 @@ jobs:
         with:
           context: .
           push: true
-          # CORRECTED: Changed 'sdlc-middleware' to 'code_gen_hld'
-          tags: paritoshvikram/code_gen_hld:${{ env.DOCKER_IMAGE_TAG }}
+          tags: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Print pushed image tag
-        # CORRECTED: Changed 'latest' to use the dynamic DOCKER_IMAGE_TAG
-        run: echo "Docker image built and pushed: paritoshvikram/code_gen_hld:${{ env.DOCKER_IMAGE_TAG }}"
+        run: echo "Docker image built and pushed: paritoshvikram/sdlc-middleware:${{ env.DOCKER_IMAGE_TAG }}"
 
       - name: Trigger Deployment Workflow in sdlc-deploy repo
-        # This is line 56 in your provided code.
-        # It must be indented with 6 spaces (2 spaces from the '- name:' above it).
-        # It should NOT have a hyphen before 'if:'.
-        if: github.event_name == 'release' 
+        if: github.event_name == 'release'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
-          repository: paritoshvikram/sdlc-deploy # <--- Replace with your actual deployment repo name
+          repository: paritoshvikram/sdlc-deploy
           event-type: deploy-sdlc-middleware-dev
           client-payload: >-
             {"service_folder":"sdlc-middleware","image_tag":"${{ env.DOCKER_IMAGE_TAG }}"}
