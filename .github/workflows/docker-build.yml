@@ -56,7 +56,10 @@ jobs:
         run: echo "Docker image built and pushed: paritoshvikram/code_gen_hld:${{ env.DOCKER_IMAGE_TAG }}"
 
       - name: Trigger Deployment Workflow in sdlc-deploy repo
-        if: github.event_name == 'release'
+        # This is line 56 in your provided code.
+        # It must be indented with 6 spaces (2 spaces from the '- name:' above it).
+        # It should NOT have a hyphen before 'if:'.
+        if: github.event_name == 'release' 
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PAT_FOR_SDLC_DEPLOY_REPO }}
