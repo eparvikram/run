@@ -1,19 +1,41 @@
 version: 0.0
+# The version of the AppSpec file format. This should not be changed.
+
 os: linux
+# The operating system of the server where the application will be deployed.
+# Common values are 'linux' or 'windows'.
+
 files:
   - source: /app
+    # The source path of your application files within your deployment artifact (the .zip file).
+    # Since your 'app' folder is at the root of your repo, this is the correct source.
     destination: /var/www/my-app
+    # The destination path on the server where the 'app' folder will be copied.
+
 permissions:
   - object: /var/www/my-app
+    # The path to which these permissions apply.
     pattern: "**"
+    # This applies the permissions to all files and directories within the path.
     owner: ubuntu
+    # Sets the owner of the files to the 'ubuntu' user.
     group: ubuntu
+    # Sets the group of the files to the 'ubuntu' group.
+
 hooks:
+# The hooks define the scripts to run at different stages of the deployment.
+# The scripts must be in the 'scripts' folder at the root of your repository.
   BeforeInstall:
     - location: scripts/install_dependencies.sh
+      # The path to your script relative to the root of your deployment artifact.
       timeout: 300
+      # The maximum time in seconds for the script to run before it's considered a failure.
       runas: root
+      # The user to run the script as. This is often 'root' for system-wide commands.
   AfterInstall:
     - location: scripts/start_application.sh
+      # The path to the script that starts your application.
       timeout: 60
+      # The maximum time in seconds for the script to run.
       runas: ubuntu
+      # The user to run this script as, typically a non-root user.
