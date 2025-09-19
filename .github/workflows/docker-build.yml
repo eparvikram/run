@@ -1,5 +1,5 @@
 
-name: CI/CD Docker Compose
+name: CI/CD Docker
 
 on:
   push:
