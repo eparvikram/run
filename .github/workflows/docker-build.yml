@@ -31,6 +31,8 @@ jobs:
           push: true
           tags: paritoshvikram/fastapi-app:latest
 
+# Corrected script in your GitHub Actions workflow
+...
       - name: Deploy to EC2
         if: success()
         uses: appleboy/ssh-action@v0.1.5
@@ -39,7 +41,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:latest
-            docker stop my-app || true
-            docker rm my-app || true
-            docker run -p 80:8000 --name fastapi_container ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-app:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-app:latest
+            docker stop fastapi_container || true
+            docker rm fastapi_container || true
+            docker run -d -p 80:8000 --name fastapi_container \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-app:latest
