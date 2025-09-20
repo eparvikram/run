@@ -43,4 +43,4 @@ jobs:
             docker stop my-app || true
             docker rm my-app || true
             docker run -p 80:8000 --name fastapi_container \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-app:latest
+              ${{secrets.DOCKER_HUB_USERNAME }}/fastapi-app:latest
